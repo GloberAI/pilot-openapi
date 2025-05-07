@@ -302,7 +302,7 @@ components:
     TargetResult:
       type: object
       properties:
-        id:
+        target-config-id:
           type: string
           format: uuid
           description: ID of the target content configuration, which could be used to rerun.

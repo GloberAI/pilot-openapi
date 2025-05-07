@@ -1,0 +1,343 @@
+openapi: 3.0.0
+info:
+  title: Glober Pilot API
+  version: 1.0.0
+  description: API for creating projects, uploading additional assets, monitor progress and rerun part of the projects.
+
+servers:
+  - url: https://api.glober.ai
+    description: The production env server
+
+security:
+  - bearerAuth: []
+
+paths:
+  /api/v1/projects:
+    post:
+      tags:
+        - projects
+      summary: Create a new project
+      description: This API endpoint is used to create a new project for content optimization requests. A single project could contain multiple target_content_config for different target users. 
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/ProjectPropertyConfig'
+      responses:
+        '201':
+          description: Success Response
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CreateProjectResponse'
+
+  /api/v1/projects/{projectId}:
+    get:
+      tags:
+        - single_project
+      summary: Get the detail of created projects
+      description: Retrieve the full project configuration, including creation and last upload time.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the project to retrieve
+      responses:
+        '200':
+          description: Project details
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectDetailsResponse'
+        '404':
+          description: Project not found
+
+  /api/v1/projects/{projectId}/assets:
+    post:
+      tags:
+        - assets
+      summary: Upload assets to a project.
+      description: Upload assets (images, videos, text files) to a project. User may uploads any sets
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the project to which assets will be added
+      requestBody:
+        required: true
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              required:
+                - assetType
+                - file
+              properties:
+                assetType:
+                  type: string
+                  enum: [IMAGE, VIDEO, TEXT, GLOSSARY]
+                  description: |
+                    Type of asset being uploaded. Supported values:
+                    - `IMAGE`: A static image file (e.g., PNG, JPG)
+                    - `VIDEO`: A video file (e.g., MP4)
+                    - `TEXT`: A plain text file (e.g., txt)
+                    - `GLOSSARY`: A list of terms and their definitions from user. Should be uploaed in csv format 
+                file:
+                  type: string
+                  format: binary
+                  description: File to be uploaded.
+      responses:
+        '201':
+          description: Asset uploaded and linked to the project
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/AssetEntity'
+
+  /api/v1/projects/{projectId}/results:
+    get:
+      tags:
+        - results
+      summary: Get project translation results
+      description: Retrieve the results of translated assets for each target configuration.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: ID of the project whose results you want to retrieve
+      responses:
+        '200':
+          description: Successfully retrieved results
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ProjectResultsResponse'
+
+  /api/v1/projects/{projectId}/rerun:
+    post:
+      tags:
+        - rerun
+      summary: Rerun asset generation for a sinle target
+      description: Reruns the asset generation for a specific target content configuration.
+      parameters:
+        - name: projectId
+          in: path
+          required: true
+          schema:
+            type: string
+          description: The ID of the project to rerun generation for
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RerunRequest'
+      responses:
+        '200':
+          description: Rerun successfully triggered
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: ok
+
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    ProjectPropertyConfig:
+      type: object
+      required:
+        - name
+        - target_platform
+        - target_content_type
+        - content_url
+        - target_content_configs
+      properties:
+        name:
+          type: string
+          description: Name of the description
+        description:
+          type: string
+          description: Optional description of the project
+        instruction:
+          description: Optinoal instruction from user to provide guidence for the project
+        target_platform:
+          type: string
+          enum: [APPLE_APP_STORE, GOOGLE_PLAY_STORE, APPLE_ADS, GOOGLE_ADS]
+          description: Platform where the content will be published. One project only target fo a single project.
+        target_content_type:
+          type: string
+          enum: [LOCALIZATION, DEMO_EXPANSION]
+          description: |
+            Type of the aim of the project.
+            - `LOCALIZATION`: Do translation for given context 
+            - `DEMO_EXPANSION`: Modify content for different target user
+        content_url:
+          type: string
+          format: uri
+          description: URL of the product, landing page or website that user want pilot service to process
+        target_content_configs:
+          type: array
+          description: List of target content configurations, including languages and demographics.
+          items:
+            $ref: '#/components/schemas/TargetContentConfig'
+
+    TargetContentConfig:
+      type: object
+      required:
+        - target_language
+        - target_location
+      properties:
+        target_language:
+          type: string
+          description: Language into which content will be translated or localized
+        target_location:
+          type: string
+          description: Target market region or country
+        target_demo_age:
+          type: string
+          description: Target demographic age range (e.g., "18-24")
+        target_demo_gender:
+          type: string
+          enum: [MALE, FEMALE, OTHER]
+          description: Target demographic gender
+        image_configs:
+          type: array
+          description: The requirement for the image that user want to generate.
+          items:
+            $ref: '#/components/schemas/ImageGenerationConfig'
+
+    ImageGenerationConfig:
+      type: object
+      required:
+        - width
+        - height
+        - count
+      properties:
+        width:
+          type: integer
+          description: Width of the image in pixels
+        height:
+          type: integer
+          description: Height of the image in pixels
+        count:
+          type: integer
+          description: Number of images will generated in this dimention
+
+    CreateProjectResponse:
+      type: object
+      properties:
+        projectId:
+          type: string
+          format: uuid
+          description: Unique identifier for the new created project.
+
+    ProjectDetailsResponse:
+      allOf:
+        - $ref: '#/components/schemas/ProjectPropertyConfig'
+        - type: object
+          properties:
+            created_at:
+              type: string
+              format: date-time
+              description: Timestamp when the project was created
+            upload_at:
+              type: string
+              format: date-time
+              description: Timestamp when the last asset was uploaded
+            status:
+              type: string
+              enum: [PENDING, IN_PROGRESS, COMPLETED, FAILED]
+              description: Type of status of the project
+            assets:
+              type: array
+              description: List of all assets uploaded to this project
+              items:
+                $ref: '#/components/schemas/AssetEntity'
+    AssetEntity:
+      type: object
+      properties:
+        project:
+          type: object
+          properties:
+            id:
+              type: string
+              format: uuid
+              description: The uuid generated for the assets.
+            name:
+              type: string
+              description: Name of the uploaded asset file
+
+    ProjectResultsResponse:
+      type: object
+      properties:
+        projectId:
+          type: string
+          format: uuid
+          description: The unique of id of the project
+        status:
+          type: string
+          description: Current status of the project (e.g., PENDING, PROCESSING, COMPLETE)
+        targets:
+          type: array
+          description: List of target configurations and their result assets
+          items:
+            $ref: '#/components/schemas/TargetResult'
+
+    TargetResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: ID of the target content configuration, which could be used to rerun.
+        results:
+          type: array
+          description: List of generated or translated asset results
+          items:
+            $ref: '#/components/schemas/AssetResult'
+
+    AssetResult:
+      type: object
+      properties:
+        id:
+          type: string
+          format: uuid
+          description: Unique identifier for the result asset
+        asset_type:
+          type: string
+          enum: [IMAGE, VIDEO, TEXT]
+          description: Type of the asset
+        name:
+          type: string
+          description: Name of the result file
+        resource_uri:
+          type: string
+          format: uri
+          description: Direct link to download or preview the generated asset
+
+    RerunRequest:
+      type: object
+      required:
+        - target_content_config_id
+      properties:
+        target_content_config_id:
+          type: string
+          format: uuid
+          description: ID of the target content configuration to rerun
+

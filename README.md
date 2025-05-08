@@ -89,10 +89,8 @@ curl -X POST https://api.glober.ai/api/v1/projects/{projectId}/assets \
 
 ```json
 {
-  "project": {
-    "id": "b84d24c3-2781-4d3f-90d5-2e7dd0632180",
+    "asset-id": "b84d24c3-2781-4d3f-90d5-2e7dd0632180",
     "name": "image.png"
-  }
 }
 ```
 
@@ -161,7 +159,7 @@ will generate 3 1920x1080 images.
   "status": "COMPLETED",
   "targets": [
     {
-      "id": "target-uuid",
+      "target-content-config-id": "target-uuid",
       "results": [
         {
           "id": "asset-result-id",
@@ -188,7 +186,7 @@ will generate 3 1920x1080 images.
 
 ```json
 {
-  "target_content_config_id": "target-uuid"
+  "target-content-config-id": "target-uuid"
 }
 ```
 

@@ -97,7 +97,7 @@ paths:
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/AssetEntity'
+                $ref: '#/components/schemas/UploadedAssetEntity'
 
   /api/v1/projects/{projectId}/results:
     get:
@@ -256,7 +256,7 @@ components:
               type: string
               format: date-time
               description: Timestamp when the project was created
-            upload_at:
+            last_edit_at:
               type: string
               format: date-time
               description: Timestamp when the last asset was uploaded
@@ -268,20 +268,17 @@ components:
               type: array
               description: List of all assets uploaded to this project
               items:
-                $ref: '#/components/schemas/AssetEntity'
-    AssetEntity:
+                $ref: '#/components/schemas/UploadedAssetEntity'
+    UploadedAssetEntity:
       type: object
       properties:
-        project:
-          type: object
-          properties:
-            id:
-              type: string
-              format: uuid
-              description: The uuid generated for the assets.
-            name:
-              type: string
-              description: Name of the uploaded asset file
+        asset-id:
+          type: string
+          format: uuid
+          description: The uuid generated for the assets.
+        name:
+          type: string
+          description: Name of the uploaded asset file
 
     ProjectResultsResponse:
       type: object
@@ -302,7 +299,7 @@ components:
     TargetResult:
       type: object
       properties:
-        target-config-id:
+        target-content-config-id:
           type: string
           format: uuid
           description: ID of the target content configuration, which could be used to rerun.
@@ -310,12 +307,12 @@ components:
           type: array
           description: List of generated or translated asset results
           items:
-            $ref: '#/components/schemas/AssetResult'
+            $ref: '#/components/schemas/GeneratedAsset'
 
-    AssetResult:
+    GeneratedAsset:
       type: object
       properties:
-        id:
+        generated-asset-id:
           type: string
           format: uuid
           description: Unique identifier for the result asset
@@ -334,9 +331,9 @@ components:
     RerunRequest:
       type: object
       required:
-        - target_content_config_id
+        - target-content-config-id
       properties:
-        target_content_config_id:
+        target-content-config-id:
           type: string
           format: uuid
           description: ID of the target content configuration to rerun

@@ -133,10 +133,8 @@ curl -X POST https://api.glober.ai/api/v1/projects/{projectId}/assets \
   "status": "IN_PROGRESS",
   "assets": [
     {
-      "project": {
         "id": "b84d24c3-2781-4d3f-90d5-2e7dd0632180",
         "name": "example.jpg"
-      }
     }
   ]
 }

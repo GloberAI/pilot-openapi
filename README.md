@@ -46,9 +46,7 @@ Authorization: Bearer <your_token_here>
       "target_location": "Saudi Arabia",
       "target_demo_age": "18-24",
       "target_demo_gender": "MALE",
-      "image_configs": [
-        { "width": 1920, "height": 1080, "count": 3 }
-      ]
+      "image_configs": [{ "width": 1920, "height": 1080, "count": 3 }]
     }
   ]
 }
@@ -89,8 +87,8 @@ curl -X POST https://api.glober.ai/api/v1/projects/{projectId}/assets \
 
 ```json
 {
-    "asset-id": "b84d24c3-2781-4d3f-90d5-2e7dd0632180",
-    "name": "image.png"
+  "asset_id": "b84d24c3-2781-4d3f-90d5-2e7dd0632180",
+  "name": "image.png"
 }
 ```
 
@@ -133,8 +131,8 @@ curl -X POST https://api.glober.ai/api/v1/projects/{projectId}/assets \
   "status": "IN_PROGRESS",
   "assets": [
     {
-        "id": "b84d24c3-2781-4d3f-90d5-2e7dd0632180",
-        "name": "example.jpg"
+      "id": "b84d24c3-2781-4d3f-90d5-2e7dd0632180",
+      "name": "example.jpg"
     }
   ]
 }
@@ -144,6 +142,7 @@ curl -X POST https://api.glober.ai/api/v1/projects/{projectId}/assets \
 will generate 3 1920x1080 images.
 
 ---
+
 ### 4. Fetch Project Results
 
 **Endpoint:** `GET /api/v1/projects/{projectId}/results`  
@@ -157,10 +156,10 @@ will generate 3 1920x1080 images.
   "status": "COMPLETED",
   "targets": [
     {
-      "target-content-config-id": "target-uuid",
+      "target_content_config_id": "target-uuid",
       "results": [
         {
-          "id": "asset-result-id",
+          "id": "asset_result_id",
           "asset_type": "IMAGE",
           "name": "result.png",
           "resource_uri": "https://s3.example.com/path/result"
@@ -184,7 +183,7 @@ will generate 3 1920x1080 images.
 
 ```json
 {
-  "target-content-config-id": "target-uuid"
+  "target_content_config_id": "target-uuid"
 }
 ```
 

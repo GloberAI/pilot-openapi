@@ -17,20 +17,20 @@ paths:
       tags:
         - projects
       summary: Create a new project
-      description: This API endpoint is used to create a new project for content optimization requests. A single project could contain multiple target_content_config for different target users. 
+      description: This API endpoint is used to create a new project for content optimization requests. A single project could contain multiple target_content_config for different target users.
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ProjectPropertyConfig'
+              $ref: "#/components/schemas/CreateProjectRequest"
       responses:
-        '201':
+        "201":
           description: Success Response
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/CreateProjectResponse'
+                $ref: "#/components/schemas/CreateProjectResponse"
 
   /api/v1/projects/{projectId}:
     get:
@@ -46,13 +46,13 @@ paths:
             type: string
           description: ID of the project to retrieve
       responses:
-        '200':
+        "200":
           description: Project details
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectDetailsResponse'
-        '404':
+                $ref: "#/components/schemas/ProjectDetailsResponse"
+        "404":
           description: Project not found
 
   /api/v1/projects/{projectId}/assets:
@@ -86,18 +86,18 @@ paths:
                     - `IMAGE`: A static image file (e.g., PNG, JPG)
                     - `VIDEO`: A video file (e.g., MP4)
                     - `TEXT`: A plain text file (e.g., txt)
-                    - `GLOSSARY`: A list of terms and their definitions from user. Should be uploaed in csv format 
+                    - `GLOSSARY`: A list of terms and their definitions from user. Should be uploaed in csv format
                 file:
                   type: string
                   format: binary
                   description: File to be uploaded.
       responses:
-        '201':
+        "201":
           description: Asset uploaded and linked to the project
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/UploadedAssetEntity'
+                $ref: "#/components/schemas/UploadAssetResponse"
 
   /api/v1/projects/{projectId}/results:
     get:
@@ -113,12 +113,12 @@ paths:
             type: string
           description: ID of the project whose results you want to retrieve
       responses:
-        '200':
+        "200":
           description: Successfully retrieved results
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ProjectResultsResponse'
+                $ref: "#/components/schemas/ProjectResultsResponse"
 
   /api/v1/projects/{projectId}/rerun:
     post:
@@ -138,9 +138,9 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/RerunRequest'
+              $ref: "#/components/schemas/RerunRequest"
       responses:
-        '200':
+        "200":
           description: Rerun successfully triggered
           content:
             application/json:
@@ -159,7 +159,7 @@ components:
       bearerFormat: JWT
 
   schemas:
-    ProjectPropertyConfig:
+    CreateProjectRequest:
       type: object
       required:
         - name
@@ -195,7 +195,7 @@ components:
           type: array
           description: List of target content configurations, including languages and demographics.
           items:
-            $ref: '#/components/schemas/TargetContentConfig'
+            $ref: "#/components/schemas/TargetContentConfig"
 
     TargetContentConfig:
       type: object
@@ -220,7 +220,7 @@ components:
           type: array
           description: The requirement for the image that user want to generate.
           items:
-            $ref: '#/components/schemas/ImageGenerationConfig'
+            $ref: "#/components/schemas/ImageGenerationConfig"
 
     ImageGenerationConfig:
       type: object
@@ -249,14 +249,14 @@ components:
 
     ProjectDetailsResponse:
       allOf:
-        - $ref: '#/components/schemas/ProjectPropertyConfig'
+        - $ref: "#/components/schemas/CreateProjectRequest"
         - type: object
           properties:
             created_at:
               type: string
               format: date-time
               description: Timestamp when the project was created
-            last_edit_at:
+            updated_at:
               type: string
               format: date-time
               description: Timestamp when the last asset was uploaded
@@ -268,22 +268,38 @@ components:
               type: array
               description: List of all assets uploaded to this project
               items:
-                $ref: '#/components/schemas/UploadedAssetEntity'
-    UploadedAssetEntity:
+                $ref: "#/components/schemas/AssetDetailEntity"
+
+    UploadAssetResponse:
       type: object
       properties:
-        asset-id:
+        asset_id:
           type: string
           format: uuid
           description: The uuid generated for the assets.
         name:
           type: string
-          description: Name of the uploaded asset file
+          description: Name of the uploaded asset file.
+
+    AssetDetailEntity:
+      type: object
+      allOf:
+        - $ref: "#/components/schemas/UploadAssetResponse"
+        - type: object
+          properties:
+            asset_type:
+              type: string
+              enum: [IMAGE, VIDEO, TEXT, GLOSSARY]
+              description: Type of the asset
+            resource_uri:
+              type: string
+              format: uri
+              description: Direct link to download or preview the uploaded asset
 
     ProjectResultsResponse:
       type: object
       properties:
-        projectId:
+        project_id:
           type: string
           format: uuid
           description: The unique of id of the project
@@ -294,12 +310,12 @@ components:
           type: array
           description: List of target configurations and their result assets
           items:
-            $ref: '#/components/schemas/TargetResult'
+            $ref: "#/components/schemas/TargetResult"
 
     TargetResult:
       type: object
       properties:
-        target-content-config-id:
+        target_content_config_id:
           type: string
           format: uuid
           description: ID of the target content configuration, which could be used to rerun.
@@ -307,12 +323,12 @@ components:
           type: array
           description: List of generated or translated asset results
           items:
-            $ref: '#/components/schemas/GeneratedAsset'
+            $ref: "#/components/schemas/GeneratedAsset"
 
     GeneratedAsset:
       type: object
       properties:
-        generated-asset-id:
+        generated_asset_id:
           type: string
           format: uuid
           description: Unique identifier for the result asset
@@ -331,10 +347,9 @@ components:
     RerunRequest:
       type: object
       required:
-        - target-content-config-id
+        - target_content_config_id
       properties:
-        target-content-config-id:
+        target_content_config_id:
           type: string
           format: uuid
           description: ID of the target content configuration to rerun
-

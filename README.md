@@ -39,7 +39,7 @@ Authorization: Bearer <your_token_here>
   "description": "test_description",
   "target_platform": "APPLE_APP_STORE",
   "target_content_type": "LOCALIZATION",
-  "content_url": "https://www.content_page_for_optimiazation.com",
+  "content_url": "https://www.content-page-for-optimization.com",
   "target_content_configs": [
     {
       "target_language": "Arabic",

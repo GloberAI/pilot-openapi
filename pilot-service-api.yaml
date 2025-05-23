@@ -219,7 +219,7 @@ components:
         target_custom_product_page:
           type: string
           enum: [APPLE_APP_CPP]
-          description: predefined formats of ads templates. APPLE_APP_CPP will include screenshot, app preview video, app icon, description, localized description. If set, image_configs will be ignored.
+          description: predefined formats of ads templates. APPLE_APP_CPP will include screenshot, app preview video, app icon, description in target language. If set, image_configs will be ignored.
         image_configs:
           type: array
           description: The requirement for the image that user want to generate.

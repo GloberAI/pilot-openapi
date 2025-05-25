@@ -216,6 +216,10 @@ components:
           type: string
           enum: [MALE, FEMALE, OTHER]
           description: Target demographic gender
+        target_custom_product_page:
+          type: string
+          enum: [APPLE_APP_CPP]
+          description: predefined formats of ads templates. APPLE_APP_CPP will include screenshot, app preview video, app icon, description in target language. If set, image_configs will be ignored.
         image_configs:
           type: array
           description: The requirement for the image that user want to generate.

@@ -196,8 +196,8 @@ async function main() {
     
     // Upload assets and look up status
     const assetItems = [
-      { type: 'IMAGE', path: 'images/7.jpg' },
-      { type: 'IMAGE', path: 'images/8.jpg' },
+      { type: 'IMAGE', path: 'images/upload-test-1.jpg' },
+      { type: 'IMAGE', path: 'images/upload-test-2.jpg' },
     ];
 
     await uploadAssetsAndLookUpStatus(token, projectId, assetItems);
